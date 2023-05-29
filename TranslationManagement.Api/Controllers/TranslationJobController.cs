@@ -9,30 +9,17 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TranslationManagement.Api.Controlers;
+using TranslationManagement.Api.Models;
 
 namespace TranslationManagement.Api.Controllers
 {
+    
     [ApiController]
     [Route("api/jobs/[action]")]
     public class TranslationJobController : ControllerBase
     {
-        public class TranslationJob
-        {
-            public int Id { get; set; }
-            public string CustomerName { get; set; }
-            public string Status { get; set; }
-            public string OriginalContent { get; set; }
-            public string TranslatedContent { get; set; }
-            public double Price { get; set; }
-        }
-
-        static class JobStatuses
-        {
-            internal static readonly string New = "New";
-            internal static readonly string Inprogress = "InProgress";
-            internal static readonly string Completed = "Completed";
-        }
-
+       
+        const double PricePerCharacter = 0.01;
         private AppDbContext _context;
         private readonly ILogger<TranslatorManagementController> _logger;
 
@@ -48,7 +35,7 @@ namespace TranslationManagement.Api.Controllers
             return _context.TranslationJobs.ToArray();
         }
 
-        const double PricePerCharacter = 0.01;
+       
         private void SetPrice(TranslationJob job)
         {
             job.Price = job.OriginalContent.Length * PricePerCharacter;
@@ -57,7 +44,7 @@ namespace TranslationManagement.Api.Controllers
         [HttpPost]
         public bool CreateJob(TranslationJob job)
         {
-            job.Status = "New";
+            job.Status = JobStatus.New;
             SetPrice(job);
             _context.TranslationJobs.Add(job);
             bool success = _context.SaveChanges() > 0;
@@ -110,22 +97,23 @@ namespace TranslationManagement.Api.Controllers
         [HttpPost]
         public string UpdateJobStatus(int jobId, int translatorId, string newStatus = "")
         {
-            _logger.LogInformation("Job status update request received: " + newStatus + " for job " + jobId.ToString() + " by translator " + translatorId);
-            if (typeof(JobStatuses).GetProperties().Count(prop => prop.Name == newStatus) == 0)
+            _logger.LogInformation($"Job status update request received:{newStatus} for job { jobId.ToString()} by translator {translatorId}");
+            //if (typeof(JobStatuses).GetProperties().Count(prop => prop.Name == newStatus) == 0)
+            if(!Enum.TryParse<JobStatus>(newStatus, true, out _))
             {
                 return "invalid status";
             }
 
             var job = _context.TranslationJobs.Single(j => j.Id == jobId);
 
-            bool isInvalidStatusChange = (job.Status == JobStatuses.New && newStatus == JobStatuses.Completed) ||
-                                         job.Status == JobStatuses.Completed || newStatus == JobStatuses.New;
+            bool isInvalidStatusChange = (job.Status == JobStatus.New && newStatus == JobStatus.Completed.ToString()) ||
+                                         job.Status == JobStatus.Completed || newStatus == JobStatus.New.ToString();
             if (isInvalidStatusChange)
             {
                 return "invalid status change";
             }
 
-            job.Status = newStatus;
+            job.Status = Enum.Parse<JobStatus>(newStatus,true);
             _context.SaveChanges();
             return "updated";
         }
