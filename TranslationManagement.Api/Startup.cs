@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
+using TranslationManagement.Api.Services;
 
 namespace TranslationManagement.Api
 {
@@ -19,6 +20,8 @@ namespace TranslationManagement.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddScoped<ITranslationJobService, TranslationJobService>();
+            services.AddScoped<ITranslatorManagementService,TranslatorManagementService>();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "TranslationManagement.Api", Version = "v1" });
