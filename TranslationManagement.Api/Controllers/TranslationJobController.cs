@@ -22,13 +22,12 @@ namespace TranslationManagement.Api.Controllers
        
         
        
-        private readonly ILogger<TranslatorManagementController> _logger;
+        
         private readonly ITranslationJobService _translationJobService;
 
-        public TranslationJobController(ILogger<TranslatorManagementController> logger,ITranslationJobService translationJobService)
+        public TranslationJobController(ITranslationJobService translationJobService)
         {
-           // _context = scopeFactory.CreateScope().ServiceProvider.GetService<AppDbContext>();
-            _logger = logger;
+           
             _translationJobService = translationJobService;
         }
 
@@ -44,11 +43,8 @@ namespace TranslationManagement.Api.Controllers
         [HttpPost]
         public bool CreateJob(TranslationJob job)
         {
-            var success = _translationJobService.CreateJob(job);
-            if (success) { 
-                _logger.LogInformation("New job notification sent");
-        }
-            return success;
+            return _translationJobService.CreateJob(job);
+           
         }
 
         [HttpPost]
@@ -60,7 +56,7 @@ namespace TranslationManagement.Api.Controllers
         [HttpPost]
         public string UpdateJobStatus(int jobId, int translatorId, string newStatus = "")
         {
-            _logger.LogInformation($"Job status update request received:{newStatus} for job { jobId.ToString()} by translator {translatorId}");
+            
            return _translationJobService.UpdateJobStatus(jobId, translatorId, newStatus);
         }
     }

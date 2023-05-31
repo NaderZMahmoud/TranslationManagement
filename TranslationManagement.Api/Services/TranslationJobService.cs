@@ -5,6 +5,8 @@ using System;
 using System.Linq;
 using System.Xml.Linq;
 using TranslationManagement.Api.Models;
+using Microsoft.Extensions.Logging;
+using TranslationManagement.Api.Controlers;
 
 namespace TranslationManagement.Api.Services
 {
@@ -13,10 +15,13 @@ namespace TranslationManagement.Api.Services
     {
         const double PricePerCharacter = 0.01;
         private readonly AppDbContext _context;
-        public TranslationJobService(AppDbContext context)
+        private readonly ILogger<TranslatorManagementController> _logger;
+        public TranslationJobService(AppDbContext context, ILogger<TranslatorManagementController> logger)
         {
 
             _context = context;
+            // _context = scopeFactory.CreateScope().ServiceProvider.GetService<AppDbContext>();
+            _logger = logger;
 
         }
         public bool CreateJob(TranslationJob job)
@@ -31,7 +36,7 @@ namespace TranslationManagement.Api.Services
                 while (!notificationSvc.SendNotification("Job created: " + job.Id).Result)
                 {
                 }
-
+                _logger.LogInformation("New job notification sent");
 
             }
 
@@ -80,6 +85,7 @@ namespace TranslationManagement.Api.Services
 
         public string UpdateJobStatus(int jobId, int translatorId, string newStatus)
         {
+            _logger.LogInformation($"Job status update request received:{newStatus} for job {jobId.ToString()} by translator {translatorId}");
             //if (typeof(JobStatuses).GetProperties().Count(prop => prop.Name == newStatus) == 0)
             if (!Enum.TryParse<JobStatus>(newStatus, true, out _))
             {
