@@ -31,6 +31,11 @@ namespace TranslationManagement.Api.Controlers
         {
             return _translatorManagementService.GetTranslators();
         }
+        [HttpGet]
+        public TranslatorModel[] GetCertifiedTranslators()
+        {
+            return _translatorManagementService.GetCertifiedTranslators();
+        }
 
         [HttpGet]
         public TranslatorModel[] GetTranslatorsByName(string name)

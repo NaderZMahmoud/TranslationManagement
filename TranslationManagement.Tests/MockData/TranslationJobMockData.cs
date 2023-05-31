@@ -25,11 +25,19 @@ namespace TranslationManagement.Tests.MockData
                 },
                  new TranslationJob()
                 {
-
+                     Id = 2,
+                    CustomerName = "Test2",
+                    OriginalContent = "Test2",
+                    Price = 2,
+                    Status = JobStatus.Completed,
                 },
                   new TranslationJob()
                 {
-
+                       Id = 3,
+                    CustomerName = "Test3",
+                    OriginalContent = "Test3",
+                    Price = 3,
+                    Status = JobStatus.InProgress,
                 },
             };
         }

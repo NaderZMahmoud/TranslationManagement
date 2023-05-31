@@ -27,6 +27,10 @@ namespace TranslationManagement.Api.Services
         {
             return _context.Translators.ToArray();
         }
+        public TranslatorModel[] GetCertifiedTranslators()
+        {
+            return _context.Translators.Where(t=>t.Status == TranslatorStatus.Certified).ToArray();
+        }
 
         public TranslatorModel[] GetTranslatorsByName(string name)
         {
